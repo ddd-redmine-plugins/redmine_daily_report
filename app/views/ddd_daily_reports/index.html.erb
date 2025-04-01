@@ -1,0 +1,58 @@
+<div class="contextual">
+  <%= link_to l(:button_create), new_ddd_daily_report_path(), :class => 'icon icon-add' %>
+</div>
+<h2><%= l(:label_daily_reports) %></h2>
+<%= render partial: 'sidebar' %>
+
+<%= form_tag(ddd_daily_reports_path, :method => :get) do %>
+<fieldset><legend><%= l(:label_filter_plural) %></legend>
+  <label for='search_date'><%= l(:field_date) %>:</label>
+  <%= date_field_tag 'search_date_from', params[:search_date_from] %>
+  <span>~</span>
+  <%= date_field_tag 'search_date_to', params[:search_date_to] %>
+  <label for='search_reporter'><%= l(:field_reporter) %>:</label>
+  <%= select_tag 'search_reporter', options_from_collection_for_select(DddDailyReport.joins(:reporter).select("reporter_id, login").distinct, :reporter_id, :login, params[:search_reporter]), include_blank: true %>
+  <%= submit_tag l(:button_apply), :class => "small" %>
+  <%= link_to l(:button_clear), ddd_daily_reports_path, :class => 'icon icon-reload' %>
+</fieldset>
+<% end %>
+&nbsp;
+
+<% if (@reports.blank?) %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<table class="list">
+<thead>
+  <tr>
+    <%= sort_header_tag('ddd_daily_reports.id', :caption => '#') %>
+    <%= sort_header_tag('date', :caption => l(:field_date)) %>
+    <%= sort_header_tag('users.login', :caption => l(:field_reporter)) %>
+    <th><%= l(:field_plans_for_tomorrow) %></th>
+    <th><%= l(:field_concerns_and_risks) %></th>
+    <th><%= l(:field_other_comments) %></th>
+    <%= sort_header_tag('ddd_daily_reports.updated_on', :caption => l(:field_updated_on)) %>
+  </tr>
+</thead>
+<tbody>
+<% @reports.each do |report| %>
+  <tr class="<%= cycle('odd', 'even') %>">
+    <td><%= link_to report.id, ddd_daily_report_path(report.id) %></td>
+    <td><%= format_date(report.date) %></td>
+    <td><%= report.reporter.try!(:login) %></td>
+    <td class="wiki"><%= textilizable report.plans_for_tomorrow %></td>
+    <td class="wiki"><%= textilizable report.concerns_and_risks %></td>
+    <td class="wiki"><%= textilizable report.other_comments %></td>
+    <td><%= format_time(report.updated_on) %></td>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<span class="pagination"><%= pagination_links_full @report_pages, @report_count %></span>
+<% end %>
+
+<style>
+table.list td.wiki {
+  text-align: left;
+  vertical-align: top;
+}
+</style>

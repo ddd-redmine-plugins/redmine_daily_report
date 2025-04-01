@@ -1,0 +1,32 @@
+<h3><%= link_to(@title, @url) %></h3>
+<p><b><%= l(:label_timelogs) %></b></p>
+<% if (@timelogs.blank?) %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<table class="list">
+<thead>
+  <tr>
+    <th class="issue"><%= l(:field_issue) %></th>
+    <th class="activity"><%= l(:field_activity) %></th>
+    <th class="comments"><%= l(:field_comments) %></th>
+    <th class="hours"><%= l(:field_hours) %></th>
+  </tr>
+</thead>
+<tbody>
+<% @timelogs.each do |timelog| %>
+  <tr class="time-entry">
+    <td class="issue"><%= link_to_issue(timelog.issue, :tracker => false, :only_path => false) %></td>
+    <td class="activity"><%= timelog.activity.try!(:name) %></td>
+    <td class="comments"><%= timelog.comments %></td>
+    <td class="hours"><%= format_hours(timelog.hours) %></td>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<% end %>
+<p><b><%= l(:field_plans_for_tomorrow) %></b></p>
+<div class="wiki"><%= textilizable @report.plans_for_tomorrow %></div>
+<p><b><%= l(:field_concerns_and_risks) %></b></p>
+<div class="wiki"><%= textilizable @report.concerns_and_risks %></div>
+<p><b><%= l(:field_other_comments) %></b></p>
+<div class="wiki"><%= textilizable @report.other_comments %></div>

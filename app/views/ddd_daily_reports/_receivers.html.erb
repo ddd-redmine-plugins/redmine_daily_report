@@ -1,0 +1,21 @@
+<% if (@receivers.blank?) %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<table class="list">
+<tbody>
+<% @receivers.each do |receiver| %>
+  <tr>
+    <td><%= receiver.receiver.try!(:login) %></td>
+    <td class="buttons">
+      <%= link_to(l(:button_delete), {:action => 'remove_receiver', :id => receiver.id}, :data => {:confirm => l(:text_are_you_sure)}, :method => :post, :remote => true, :class => 'icon icon-del') %>
+    </td>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<% end %>
+<%= form_for @receiver, :as => :receiver, :url => {:action => 'add_receiver'}, :remote => true do |f| %>
+  <%= f.hidden_field :reporter_id, value: @receiver.reporter_id %>
+  <%= f.select :receiver_id, options_from_collection_for_select(@receiver_candidates, :id, :login) %>
+  <%= f.submit l(:button_add), :disabled => @receiver_candidates.empty? %>
+<% end %>

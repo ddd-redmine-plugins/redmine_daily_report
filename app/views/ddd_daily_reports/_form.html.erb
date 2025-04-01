@@ -1,0 +1,6 @@
+<div class="box">
+  <p><%= form.text_area :plans_for_tomorrow, :class => 'wiki-edit' %></p>
+  <p><%= form.text_area :concerns_and_risks, :class => 'wiki-edit' %></p>
+  <p><%= form.text_area :other_comments, :class => 'wiki-edit' %></p>
+  <p><%= form.hidden_field :reporter_id, value: @report.reporter.id %></p>
+</div>

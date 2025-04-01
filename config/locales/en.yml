@@ -1,0 +1,28 @@
+# English strings go here for Rails i18n
+en:
+  # my_label: "My label"
+  label_ddd_daily_report: Daily Report
+  label_ddd_timelog: Time Log
+
+  label_daily_reports: Daily Reports
+  label_new_daily_report: New Daily Report
+  label_daily_report: "Daily Report #%{id}"
+  label_daily_report_subject: "Daily report for %{date} by %{reporter}"
+  label_dally_report_receiver: Who you report to
+
+  field_date: Date
+  field_reporter: Reporter
+  field_plans_for_tomorrow: Plans for tomorrow
+  field_concerns_and_risks: Concerns and risks
+  field_other_comments: Other comments
+
+  error_report_already_exists: "- Report for %{value} already exists."
+
+  label_timelogs: Time Logs
+  label_new_timelog: New Time Log
+
+  error_no_issue_selected_to_add_timelog: Please, select the issue you want to add timelog.
+  error_no_timelog_selected_to_delete: Please, select the timelog(s) you want to delete.
+  error_unable_add_timelog: "Adding timelog to issue %{id} is not allowed."
+  error_unable_edit_timelog: "Editing timelog for issue %{id} is not allowed."
+  error_unable_delete_timelog: "Deleting timelog for issue %{id} is not allowed."

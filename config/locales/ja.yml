@@ -1,0 +1,28 @@
+# English strings go here for Rails i18n
+ja:
+  # my_label: "My label"
+  label_ddd_daily_report: 日報
+  label_ddd_timelog: 作業時間
+
+  label_daily_reports: 日報
+  label_new_daily_report: 新しい日報
+  label_daily_report: "日報 #%{id}"
+  label_daily_report_subject: "%{date} の %{reporter} の日報"
+  label_dally_report_receiver: 報告先
+
+  field_date: 日付
+  field_reporter: 報告者
+  field_plans_for_tomorrow: 明日の予定
+  field_concerns_and_risks: 心配事やリスクなどの兆候
+  field_other_comments: その他全体的なコメント
+
+  error_report_already_exists: "- %{value} の日報はすでに存在します。"
+
+  label_timelogs: 作業時間
+  label_new_timelog: 作業時間の追加
+
+  error_no_issue_selected_to_add_timelog: 作業時間を追加するチケットを選択してください。
+  error_no_timelog_selected_to_delete: 削除する作業時間を選択してください。
+  error_unable_add_timelog: "チケット %{id} に作業時間を追加することはできません。"
+  error_unable_edit_timelog: "チケット %{id} の作業時間を編集することはできません。"
+  error_unable_delete_timelog: "チケット %{id} の作業時間を削除することはできません。"

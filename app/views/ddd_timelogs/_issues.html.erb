@@ -1,0 +1,2 @@
+  <label for='search_issue'><%= l(:label_issue) %>:</label>
+  <%= select_tag 'search_issue[]', options_for_select(@options_for_search_issue, params[:search_issue]), multiple: true %>

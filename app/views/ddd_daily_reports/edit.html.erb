@@ -1,0 +1,13 @@
+<h2><%= l(:label_daily_report, :id => @report.id) %></h2>
+<h3><%= l(:label_daily_report_subject, :date => date_field_tag('report[date]', @report.date, :form => 'edit_report', disabled: true), :reporter => @report.reporter.try!(:login)).html_safe %></h3>
+<%= render partial: 'sidebar' %>
+<div id="timelogs-section">
+<%= render partial: 'timelogs' %>
+</div>
+<br>
+<%= labelled_form_for :report, @report, :url => ddd_daily_report_path(@report.id) do |f| %>
+  <%= render :partial => 'ddd_daily_reports/form', :locals => {:form => f} %>
+  <%= error_messages_for 'report' %>
+  <%= f.submit l(:button_update) %>
+<% end %>
+<%= link_to l(:button_back), :back %>

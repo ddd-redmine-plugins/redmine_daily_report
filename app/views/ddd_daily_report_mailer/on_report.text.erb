@@ -1,0 +1,21 @@
+<%= @title %>
+<%= @url %>
+
+= <%= l(:label_timelogs) %> =
+<% if (@timelogs.blank?) %>
+<%= l(:label_no_data) %>
+<% else %>
+<%= l(:field_issue) %>, <%= l(:field_activity) %>, <%= l(:field_comments) %>, <%= l(:field_hours) %>
+<% @timelogs.each do |timelog| %>
+#<%= timelog.issue_id %>: <%= timelog.issue.try!(:subject) %>, <%= timelog.activity.try!(:name) %>, <%= timelog.comments %>, <%= format_hours(timelog.hours) %>
+<% end %>
+<% end %>
+
+= <%= l(:field_plans_for_tomorrow) %> =
+<%= @report.plans_for_tomorrow %>
+
+= <%= l(:field_concerns_and_risks) %> =
+<%= @report.concerns_and_risks %>
+
+= <%= l(:field_other_comments) %> =
+<%= @report.other_comments %>

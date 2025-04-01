@@ -1,0 +1,43 @@
+<div class="contextual">
+  <%= link_to(l(:button_edit), {:action => 'edit', :id => @report.id}, :class => 'icon icon-edit') %>
+  <%= link_to(l(:button_delete), {:action => 'destroy', :id => @report.id}, :data => {:confirm => l(:text_are_you_sure)}, :method => :delete, :class => 'icon icon-del') %>
+</div>
+<h2><%= l(:label_daily_report, :id => @report.id) %></h2>
+<h3><%= l(:label_daily_report_subject, :date => format_date(@report.date), :reporter => @report.reporter.try!(:login)) %></h3>
+<%= render partial: 'sidebar' %>
+<fieldset><legend><%= l(:label_timelogs) %></legend>
+<% if (@timelogs.blank?) %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<table class="list">
+<thead>
+  <tr>
+    <th class="issue"><%= l(:field_issue) %></th>
+    <th class="activity"><%= l(:field_activity) %></th>
+    <th class="comments"><%= l(:field_comments) %></th>
+    <th class="hours"><%= l(:field_hours) %></th>
+  </tr>
+</thead>
+<tbody>
+<% @timelogs.each do |timelog| %>
+  <tr class="time-entry">
+    <td class="issue"><%= link_to_issue(timelog.issue, :tracker => false) %></td>
+    <td class="activity"><%= timelog.activity.try!(:name) %></td>
+    <td class="comments"><%= timelog.comments %></td>
+    <td class="hours"><%= format_hours(timelog.hours) %></td>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<% end %>
+</fieldset>
+<br>
+<div class="box">
+  <p><b><%= l(:field_plans_for_tomorrow) %></b></p>
+  <div class="wiki"><%= textilizable @report.plans_for_tomorrow %></div>
+  <p><b><%= l(:field_concerns_and_risks) %></b></p>
+  <div class="wiki"><%= textilizable @report.concerns_and_risks %></div>
+  <p><b><%= l(:field_other_comments) %></b></p>
+  <div class="wiki"><%= textilizable @report.other_comments %></div>
+</div>
+<%= link_to l(:button_list), ddd_daily_reports_path() %>

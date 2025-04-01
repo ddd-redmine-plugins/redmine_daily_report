@@ -1,0 +1,93 @@
+<h2><%= l(:label_timelogs) %></h2>
+
+<%= form_tag(ddd_timelogs_path, :method => :get) do %>
+<fieldset><legend><%= l(:label_filter_plural) %></legend>
+  <label for='search_date'><%= l(:field_date) %>:</label>
+  <%= date_field_tag 'search_date_from', params[:search_date_from] %>
+  <span>~</span>
+  <%= date_field_tag 'search_date_to', params[:search_date_to] %>
+  <label for='search_user'><%= l(:label_user) %>:</label>
+  <%= select_tag 'search_user', options_for_select(@options_for_search_user, params[:search_user] || @default_search_user) %>
+  <span id="issues-section"><%= render partial: 'issues' %></span>
+  <%= submit_tag l(:button_apply), :class => "small" %>
+  <%= link_to l(:button_clear), {}, :class => 'icon icon-reload' %>
+</fieldset>
+<% end %>
+<%= form_tag(update_issues_ddd_timelogs_path, :method => :post, id: "issues", :remote => true) do %>
+  <%= hidden_field_tag :hidden_date_from %>
+  <%= hidden_field_tag :hidden_date_to %>
+  <%= hidden_field_tag :hidden_user %>
+  <%= hidden_field_tag :hidden_issue %>
+<% end %>
+<script>
+$('#search_date_from,#search_date_to,#search_user').off('change').on('change', (e) => {
+  $('#hidden_date_from').val($('#search_date_from').val());
+  $('#hidden_date_to').val($('#search_date_to').val());
+  $('#hidden_user').val($('#search_user').val());
+  $('#hidden_issue').val($('#search_issue_').val());
+  // $('form#issues').submit();
+  Rails.fire($('form#issues')[0], 'submit');
+});
+</script>
+&nbsp;
+
+<% if (@time_entries.blank?) %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<table class="list">
+<thead>
+  <tr>
+    <%= sort_header_tag('spent_on', :caption => l(:field_date)) %>
+    <% @issue_ids.each do |id| %>
+    <th class="timelog"><%= link_to_issue(Issue.find(id), :tracker => false) %></th>
+    <% end %>
+  </tr>
+</thead>
+<tbody>
+<% @time_entries.each do |row| %>
+  <tr class="<%= cycle('odd', 'even') %>">
+    <td><%= format_date(row[0]) %></td>
+    <% @issue_ids.each do |id| %>
+    <td class="timelogs">
+    <% if (row[1][id].present?) %>
+      <% row[1][id].each do |log| %>
+      <div class="timelogs-details">
+        <p>
+          <span><%= format_hours(log.hours) %></span>
+          <span><%= log.activity.try!(:name) %></span>
+        </p>
+        <p>
+          <span><%= log.comments %></span>
+        </p>
+      </div>
+      <% end %>
+    <% end %>
+    </td>
+    <% end %>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<span class="pagination"><%= pagination_links_full @date_pages, @date_count %></span>
+<% end %>
+
+<style>
+table.list {
+  table-layout: fixed;
+}
+table.list th:first-child {
+  width: 100px;
+}
+table.list th.timelog {
+  white-space: normal;
+}
+table.list td.timelogs {
+  text-align: left;
+  vertical-align: top;
+  word-break: break-word;
+  height: 24px; /* temp */
+}
+table.list td.timelogs div.timelogs-details {
+  margin: 2px
+}
+</style>

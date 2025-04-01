@@ -1,0 +1,130 @@
+<%= form_tag(update_timelogs_ddd_daily_reports_path, :method => :post, id: "timelogs", :remote => true) do %>
+<fieldset><legend><%= l(:label_timelogs) %></legend>
+<% if (@timelogs.blank?) %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+<table id="grid1" class="list">
+<thead>
+  <tr>
+    <th class="exclamation"></th>
+    <th class="issue"><%= l(:field_issue) %></th>
+    <th class="activity"><%= l(:field_activity) %></th>
+    <th class="comments"><%= l(:field_comments) %></th>
+    <th class="hours"><%= l(:field_hours) %></th>
+    <th class="check"><%= l(:button_delete) %></th>
+  </tr>
+</thead>
+<tbody>
+<% @timelogs.each do |timelog| %>
+<%= fields_for('timelogs[]', timelog, index: timelog.id) do |fh| %>
+  <% editable = timelog.editable_by?(User.current)%>
+  <tr class="<%= "editable" if editable %>">
+    <td class="exclamation">
+      <%= image_tag("exclamation.png", alt: "") if (flash[:timelog_failed_ids] || []).include?(timelog.id) %>
+    </td>
+    <td class="issue">
+      <p><%= link_to_issue(timelog.issue, :tracker => false) %></p>
+      <%= fh.hidden_field :issue_id, {disabled: !editable} %>
+    </td>
+    <td class="activity"><%= fh.select :activity_id, options_from_collection_for_select(TimeEntryActivity.all, :id, :name, timelog.activity_id), {}, {disabled: !editable} %></td>
+    <td class="comments"><%= fh.text_field :comments, {disabled: !editable} %></td>
+    <td class="hours"><%= fh.text_field :hours, {size: 6, disabled: !editable, value: format_hours(timelog.hours)} %></td>
+    <td class="checkbox"><%= check_box_tag "deletes[#{timelog.id}]", timelog.issue_id, false, {disabled: !editable} %></td>
+  </tr>
+<% end %>
+<% end %>
+</tbody>
+</table>
+<%= render_error_messages(flash[:timelog_edit_errors]) %>
+<div style="display: flex; justify-content: space-between;">
+<%= submit_tag l(:button_update), name: :update %>
+<%= submit_tag l(:button_delete), name: :delete, :data => {:confirm => l(:text_time_entries_destroy_confirmation)} %>
+</div>
+<% end %>
+</fieldset>
+<fieldset><legend><%= l(:label_new_timelog) %></legend>
+<table class="list">
+<thead>
+  <tr>
+    <th class="issue-select"><%= l(:field_issue) %></th>
+    <th class="activity"><%= l(:field_activity) %></th>
+    <th><%= l(:field_comments) %></th>
+    <th class="hours"><%= l(:field_hours) %></th>
+    <th class="check"><span style="visibility: hidden;"><%= l(:button_delete) %></span></th>
+  </tr>
+</thead>
+<tbody>
+<%= fields_for('new_timelog', @new_timelog, index: nil) do |f| %>
+  <tr>
+    <td><%= f.select :issue_id, options_for_select(@issue_select_options, selected: '') %></td>
+    <td><%= f.select :activity_id, options_from_collection_for_select(TimeEntryActivity.all, :id, :name, @new_timelog.activity_id) %></td>
+    <td class="comments"><%= f.text_field :comments %></td>
+    <td><%= f.text_field :hours, size: 6 %></td>
+    <td></td>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<%= render_error_messages(flash[:timelog_add_errors]) %>
+<%= submit_tag l(:button_add), name: :add %>
+</fieldset>
+<%= hidden_field_tag :spent_on, @spent_on %>
+<%= hidden_field_tag :reporter_id, @reporter_id %>
+<% end %>
+
+<script>
+$('#report_date').off('change').on('change', (e) => {
+  $('#spent_on').val($('#report_date').val());
+  // $('form#timelogs').submit();
+  Rails.fire($('form#timelogs')[0], 'submit');
+});
+if ($('table.list>tbody>tr.editable').length == 0) {
+  $('input[name="update"]').prop('disabled', true);
+}
+$('input[id^="deletes_"]').off('change').on('change', (e) => {
+  const disabled = ($('input[id^="deletes_"]:checked').length == 0);
+  $('input[name="delete"]').prop('disabled', disabled);
+}).change();
+$('#new_timelog__issue_id').off('change').on('change', (e) => {
+  const disabled = ($(e.currentTarget).val() == '');
+  $('input[name="add"]').prop('disabled', disabled);
+}).change();
+</script>
+
+<style>
+table.list {
+  table-layout: auto;
+  width: 100%;
+}
+table.list th.exclamation {
+  width: 0px;
+}
+table.list th.issue-select {
+  width: 100px;
+}
+table.list th.activity {
+  width: 0px;
+}
+table.list th.hours {
+  width: 0px;
+}
+table.list th.check {
+  width: 0px;
+}
+table.list td.comments input {
+  width: 100%;
+  box-sizing: border-box;
+}
+#grid1 td.exclamation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  width: 16px;
+}
+#grid1 td.issue {
+  text-align: left;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+</style>

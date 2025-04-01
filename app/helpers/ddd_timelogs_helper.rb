@@ -1,0 +1,2 @@
+module DddTimelogsHelper
+end

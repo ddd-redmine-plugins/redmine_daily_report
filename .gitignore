@@ -1,0 +1,8 @@
+/assets/images/*
+/assets/javascripts/*
+/assets/stylesheets/*
+!/assets/images/.gitkeep
+!/assets/javascripts/.gitkeep
+!/assets/stylesheets/.gitkeep
+/lib/tasks/*
+!/lib/tasks/.gitkeep
