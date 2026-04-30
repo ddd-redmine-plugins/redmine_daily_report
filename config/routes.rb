@@ -12,6 +12,9 @@ Rails.application.routes.draw do
       post :update_timelogs
       get :timelogs
     end
+    collection do
+      get :export
+    end
   end
   resources :ddd_timelogs, :only => [:index] do
     collection do

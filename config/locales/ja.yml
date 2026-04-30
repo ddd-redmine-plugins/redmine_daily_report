@@ -18,6 +18,9 @@ ja:
 
   error_report_already_exists: "- %{value} の日報はすでに存在します。"
 
+  label_export: エクスポート
+  button_export_csv: CSVエクスポート
+
   label_timelogs: 作業時間
   label_new_timelog: 作業時間の追加
 

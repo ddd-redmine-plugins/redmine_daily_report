@@ -3,4 +3,15 @@
 <div id="receivers-section">
 <%= render partial: 'receivers' %>
 </div>
+
+<% if controller.action_name == 'index' %>
+<h3><%= l(:label_export) %></h3>
+<%= link_to l(:button_export_csv),
+      export_ddd_daily_reports_path(
+        search_reporter: params[:search_reporter],
+        search_date_from: params[:search_date_from],
+        search_date_to: params[:search_date_to]
+      ),
+      :class => 'icon icon-save' %>
+<% end %>
 <% end %>

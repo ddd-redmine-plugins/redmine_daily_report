@@ -1,25 +1,17 @@
 class DddDailyReportsController < ApplicationController
   before_action :require_login
-  before_action :find_report, :except => [:index, :new, :create, :add_receiver, :remove_receiver, :receivers, :update_timelogs, :timelogs]
-  before_action :init_receivers, :except => [:add_receiver, :remove_receiver, :update_timelogs, :timelogs]
+  before_action :find_report, :except => [:index, :new, :create, :add_receiver, :remove_receiver, :receivers, :update_timelogs, :timelogs, :export]
+  before_action :init_receivers, :except => [:add_receiver, :remove_receiver, :update_timelogs, :timelogs, :export]
 
   helper :sort
   include SortHelper
 
 
   def index
-    sort_init ['date', 'users.login']
+    sort_init [['date', 'desc'], 'users.login']
     sort_update %w(ddd_daily_reports.id date users.login ddd_daily_reports.updated_on)
 
-    reports = DddDailyReport.includes(:reporter)
-    reports = reports.where(reporter_id: params[:search_reporter]) if params[:search_reporter].present?
-    if params[:search_date_from].present? && params[:search_date_to].present?
-      reports = reports.where(date: params[:search_date_from]..params[:search_date_to])
-    elsif params[:search_date_from].present?
-      reports = reports.where("date >= ?", params[:search_date_from])
-    elsif params[:search_date_to].present?
-      reports = reports.where("date <= ?", params[:search_date_to])
-    end
+    reports = filtered_reports
     @report_count = reports.count
     @limit = per_page_option
     @report_pages = Paginator.new @report_count, @limit, params[:page]
@@ -172,7 +164,58 @@ class DddDailyReportsController < ApplicationController
   end
 
 
+  def export
+    require 'csv'
+
+    reports = filtered_reports.order('ddd_daily_reports.date DESC, users.login')
+
+    csv_data = CSV.generate(encoding: 'UTF-8', force_quotes: true) do |csv|
+      csv << [
+        l(:field_id),
+        l(:field_date),
+        l(:field_reporter),
+        l(:field_plans_for_tomorrow),
+        l(:field_concerns_and_risks),
+        l(:field_other_comments),
+        l(:field_created_on),
+        l(:field_updated_on)
+      ]
+      reports.each do |r|
+        csv << [
+          r.id,
+          r.date,
+          r.reporter&.login,
+          r.plans_for_tomorrow,
+          r.concerns_and_risks,
+          r.other_comments,
+          r.created_on,
+          r.updated_on
+        ]
+      end
+    end
+
+    send_data "\xEF\xBB\xBF" + csv_data,
+              filename: "daily_reports_#{Date.current}.csv",
+              type: 'text/csv; charset=utf-8',
+              disposition: 'attachment'
+  end
+
+
 private
+  def filtered_reports
+    reports = DddDailyReport.eager_load(:reporter)
+    reports = reports.where(reporter_id: params[:search_reporter]) if params[:search_reporter].present?
+    if params[:search_date_from].present? && params[:search_date_to].present?
+      reports = reports.where(date: params[:search_date_from]..params[:search_date_to])
+    elsif params[:search_date_from].present?
+      reports = reports.where("date >= ?", params[:search_date_from])
+    elsif params[:search_date_to].present?
+      reports = reports.where("date <= ?", params[:search_date_to])
+    end
+    reports
+  end
+
+
   def find_report
     @report = DddDailyReport.find_by_id(params[:id])
     render_404 unless @report
@@ -197,7 +240,7 @@ private
     # ※ ログインユーザに作業時間の追加が許可されていないチケットは非活性にする
     watched = Watcher.select(:watchable_id).where(watchable_type: 'Issue', user_id: reporter_id)
     @issue_select_options = [['', '']]
-    Issue.where(id: watched).order(updated_on: 'DESC').each { |i|
+    Issue.where(id: watched).order(updated_on: 'DESC').limit(500).each { |i|
       allowed = User.current.allowed_to?(:log_time, i.project)
       # @issue_select_options << [allowed ? "##{i.id}" : "##{i.id}*", i.id, {title: i.subject}]
       @issue_select_options << ["##{i.id}", i.id, {title: i.subject, disabled: !allowed}]

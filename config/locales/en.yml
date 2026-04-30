@@ -18,6 +18,9 @@ en:
 
   error_report_already_exists: "- Report for %{value} already exists."
 
+  label_export: Export
+  button_export_csv: Export CSV
+
   label_timelogs: Time Logs
   label_new_timelog: New Time Log
 

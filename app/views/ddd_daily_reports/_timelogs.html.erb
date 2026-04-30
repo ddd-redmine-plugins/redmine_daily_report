@@ -73,22 +73,34 @@
 <% end %>
 
 <script>
-$('#report_date').off('change').on('change', (e) => {
-  $('#spent_on').val($('#report_date').val());
-  // $('form#timelogs').submit();
-  Rails.fire($('form#timelogs')[0], 'submit');
+$(function() {
+  $(document)
+    .off('change.ddd', '#report_date')
+    .on('change.ddd', '#report_date', function(e) {
+      $('#spent_on').val($('#report_date').val());
+      Rails.fire($('form#timelogs')[0], 'submit');
+    });
+
+  if ($('table.list>tbody>tr.editable').length == 0) {
+    $('input[name="update"]').prop('disabled', true);
+  }
+
+  $(document)
+    .off('change.ddd', 'input[id^="deletes_"]')
+    .on('change.ddd', 'input[id^="deletes_"]', function(e) {
+      const disabled = ($('input[id^="deletes_"]:checked').length == 0);
+      $('input[name="delete"]').prop('disabled', disabled);
+    });
+  $('input[id^="deletes_"]').trigger('change');
+
+  $(document)
+    .off('change.ddd', '#new_timelog__issue_id')
+    .on('change.ddd', '#new_timelog__issue_id', function(e) {
+      const disabled = ($(e.currentTarget).val() == '');
+      $('input[name="add"]').prop('disabled', disabled);
+    });
+  $('#new_timelog__issue_id').trigger('change');
 });
-if ($('table.list>tbody>tr.editable').length == 0) {
-  $('input[name="update"]').prop('disabled', true);
-}
-$('input[id^="deletes_"]').off('change').on('change', (e) => {
-  const disabled = ($('input[id^="deletes_"]:checked').length == 0);
-  $('input[name="delete"]').prop('disabled', disabled);
-}).change();
-$('#new_timelog__issue_id').off('change').on('change', (e) => {
-  const disabled = ($(e.currentTarget).val() == '');
-  $('input[name="add"]').prop('disabled', disabled);
-}).change();
 </script>
 
 <style>
